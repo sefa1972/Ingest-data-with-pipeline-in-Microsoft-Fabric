@@ -1,91 +1,58 @@
 # Microsoft Fabric - Sales Data Ingestion Pipeline
 
-This project demonstrates a complete Extract, Transform, Load (ETL) process using **Microsoft Fabric**. It shows how to ingest data from an external HTTP source, store it in a **Lakehouse**, process it using **Apache Spark Notebooks**, and load it into a **Delta Lake** table.
+This project demonstrates how to build an end-to-end data ingestion and transformation pipeline using **Microsoft Fabric**. It includes steps for ingesting raw sales data from an external source, transforming it using a **Spark notebook**, and storing it in a **Delta Lake table** within a **Lakehouse**.
 
 ## Project Overview
 
-- Create a Fabric Workspace
-- Create a Lakehouse
-- Ingest data using a pipeline with Copy Data and Delete Data activities
-- Transform data using a Spark notebook
-- Store processed data in a Delta Lake table
+- Create a Microsoft Fabric workspace
+- Set up a Lakehouse for storing files and tables
+- Ingest data from an external URL using a Fabric pipeline
+- Use a notebook to transform and load data
+- Store the final dataset in a Delta Lake table
 
 ## Technologies Used
 
-- Microsoft Fabric (Trial)
-- Apache Spark
-- Delta Lake
-- Fabric Lakehouse
-- Fabric Pipelines
-- Notebooks
+- Microsoft Fabric
+- Lakehouse architecture
+- Apache Spark Notebooks
+- Fabric Data Pipelines
+- Delta Lake format
 
-## Workflow Steps
+## Process Overview
 
-### 1. Create Workspace and Lakehouse
+1. **Workspace Setup**  
+   A new Fabric workspace is created with trial or premium capacity.
 
-- Create a workspace with Fabric capacity enabled.
-- Within the workspace, create a Lakehouse.
-- Add a folder named `new_data` under the `Files` section.
+2. **Lakehouse Creation**  
+   A Lakehouse is created in the workspace to manage structured and file-based data.
 
-### 2. Create and Configure a Pipeline
+3. **Data Ingestion Pipeline**  
+   A pipeline is created with a Copy Data activity that downloads sales data from an HTTP URL and stores it in the Lakehouse’s file system.
 
-- Use a **Copy Data** activity to ingest data from:
-  https://raw.githubusercontent.com/MicrosoftLearning/dp-data/main/sales.csv
+4. **Notebook Transformation**  
+   A Spark notebook processes the raw CSV data, adds derived columns, filters and reorders fields, and saves the result as a Delta Lake table.
 
-- Store the file at:
-Files/new_data/sales.csv
+5. **ETL Automation**  
+   The pipeline is modified to:
+   - Delete old files before each run
+   - Execute the notebook as part of the automated ETL flow
 
+6. **Table Verification**  
+   The transformed data is saved into a table, which is visible under the Tables section of the Lakehouse for exploration and analysis.
 
-### 3. Process Data in a Spark Notebook
+## Outcome
 
-Create a new notebook with the following parameter cell:
+By the end of the process, you will have a fully automated pipeline that:
+- Downloads and updates source data
+- Transforms it using Spark
+- Loads it into a queryable table format (Delta Lake)
 
-```python
-table_name = "sales"
+## Cleanup (Optional)
 
-Below it, add this Spark code to read, transform, and load data:
-from pyspark.sql.functions import *
-
-# Read the new sales data
-df = spark.read.format("csv").option("header","true").load("Files/new_data/*.csv")
-
-# Add Year and Month columns
-df = df.withColumn("Year", year(col("OrderDate"))).withColumn("Month", month(col("OrderDate")))
-
-# Derive FirstName and LastName
-df = df.withColumn("FirstName", split(col("CustomerName"), " ").getItem(0)) \
-       .withColumn("LastName", split(col("CustomerName"), " ").getItem(1))
-
-# Reorder columns
-df = df["SalesOrderNumber", "SalesOrderLineNumber", "OrderDate", "Year", "Month",
-        "FirstName", "LastName", "EmailAddress", "Item", "Quantity", "UnitPrice", "TaxAmount"]
-
-# Save to Delta table
-df.write.format("delta").mode("append").saveAsTable(table_name)
+To delete all resources:
+- Open the workspace settings in Microsoft Fabric
+- Select **Remove this workspace** to delete all assets created in this project
 
 
 
 
-
-Run the notebook. The Spark runtime will start automatically on first use.
-
-### 4. Enhance the Pipeline ### 
-Add a Delete Data activity to remove old .csv files from new_data/ before copying new data.
-
-Add a Notebook activity to run the notebook and pass a parameter:
-
-Name: table_name
-Type: String
-Value: new_sales
-5. Execute the Pipeline
-Save and run the pipeline.
-
-A new Delta Lake table called new_sales will be created and loaded with transformed data.
-
-Final Result
-You can explore the sales or new_sales Delta Lake table in your lakehouse to view the transformed data, ready for analytics or reporting.
-
-Cleanup (Optional)
-To remove all resources created during this project:
-
-Go to Workspace Settings > Remove this workspace > Confirm Delete.
