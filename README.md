@@ -63,12 +63,17 @@ df = df["SalesOrderNumber", "SalesOrderLineNumber", "OrderDate", "Year", "Month"
 # Save to Delta table
 df.write.format("delta").mode("append").saveAsTable(table_name)
 
+
+
+
+
 Run the notebook. The Spark runtime will start automatically on first use.
 
 ### 4. Enhance the Pipeline ### 
 Add a Delete Data activity to remove old .csv files from new_data/ before copying new data.
 
 Add a Notebook activity to run the notebook and pass a parameter:
+
 Name: table_name
 Type: String
 Value: new_sales
