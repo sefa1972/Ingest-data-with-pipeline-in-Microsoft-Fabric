@@ -53,6 +53,9 @@ To delete all resources:
 - Open the workspace settings in Microsoft Fabric
 - Select **Remove this workspace** to delete all assets created in this project
 
+### 👤 Author >> Sefa Öztürk
+IT Trainee | Azure Data Engineer in progress
 
+📇 LinkedIn: https://www.linkedin.com/in/sefa-ozturk1972
 
 
